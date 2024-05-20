@@ -5,11 +5,11 @@ public class JRedis {
             var server = new JRedisServer(options);
             server.start();
         } catch (IllegalArgumentException e) {
-            System.out.println("Error while parsing arguments: " + e.getMessage());
+            System.out.println("Error while parsing arguments, " + e.getMessage());
         }
     }
 
-    private static CliOptions parseCliArgs(String[] args) {
+    private static CliOptions parseCliArgs(String[] args) throws IllegalArgumentException {
         var options = new CliOptions();
         for (int i = 0; i < args.length; i++) {
             var arg = args[i];

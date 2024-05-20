@@ -4,9 +4,6 @@ public class CliOptions {
     public String user = "jredis";
     public String password = "password";
 
-    public CliOptions() {
-    }
-
     public CliOptions setPort(int port) {
         this.port = port;
         return this;
