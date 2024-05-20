@@ -15,7 +15,7 @@ public class JRedisServer {
         try {
             // Create a server socket that listens on port 12345
             ServerSocket serverSocket = new ServerSocket(config.port);
-            System.out.println("Server started. Waiting for client connection...");
+            System.out.printf("JRedis server started at port %d \n", this.config.port);
 
             // Accept client connections
             Socket clientSocket = serverSocket.accept();
@@ -33,7 +33,7 @@ public class JRedisServer {
                 System.out.println("Received from client: " + receivedData);
 
                 // Echo back to the client
-                outputStream.write(receivedData.getBytes());
+                outputStream.write("OK \n".getBytes());
             }
 
             // Close the client socket
