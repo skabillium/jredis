@@ -22,6 +22,10 @@ public class ConnectionContext {
         out.write(RespSerializer.serialize(message).getBytes());
     }
 
+    public void write(int i) throws IOException {
+        out.write(RespSerializer.serialize(i).getBytes());
+    }
+
     public void write(Exception e) throws IOException {
         out.write(RespSerializer.serialize(e).getBytes());
     }

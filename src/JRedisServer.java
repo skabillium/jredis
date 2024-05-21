@@ -53,6 +53,7 @@ public class JRedisServer {
                             var value = db.get(get.key);
                             context.write(value);
                         }
+                        case Command.DeleteCommand del -> context.write(db.delete(del.keys));
                         default -> context.writeln("IDK what to do with that");
                     }
                 } catch (Exception e) {

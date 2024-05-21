@@ -25,4 +25,12 @@ public class Command {
             this.value = value;
         }
     }
+
+    public static class DeleteCommand extends Command {
+        public String[] keys;
+
+        DeleteCommand(String[] keys) {
+            this.keys = keys;
+        }
+    }
 }

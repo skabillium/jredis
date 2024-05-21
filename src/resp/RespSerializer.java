@@ -9,6 +9,10 @@ public class RespSerializer {
         return String.format("-%s\r\n", e.getMessage());
     }
 
+    public static String serialize(int i) {
+        return String.format(":%d\r\n", i);
+    }
+
     public static String serializeNull() {
         return "$-1\r\n";
     }

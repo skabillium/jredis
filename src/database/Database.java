@@ -23,4 +23,15 @@ public class Database {
             default -> throw new WrongTypeException();
         };
     }
+
+    public int delete(String[] keys) {
+        var deleted = 0;
+        for (var key : keys) {
+            var exists = this.keys.remove(key);
+            if (exists != null) {
+                deleted++;
+            }
+        }
+        return deleted;
+    }
 }
