@@ -1,7 +1,5 @@
 package commands;
 
-import java.util.ArrayList;
-
 public class CommandParser {
     public static Command parseCommand(String source) throws IllegalArgumentException {
         var split = splitTokens(source);

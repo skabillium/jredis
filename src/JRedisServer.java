@@ -35,7 +35,6 @@ public class JRedisServer {
                 try {
                     var payload = new String(buffer, 0, bytesRead);
                     payload = payload.trim();
-
                     if (payload.isEmpty()) {
                         continue;
                     }
@@ -56,6 +55,8 @@ public class JRedisServer {
                         case Command.DeleteCommand del -> context.write(db.delete(del.keys));
                         default -> context.writeln("IDK what to do with that");
                     }
+                } catch (NotFoundException e) {
+                    context.nil();
                 } catch (Exception e) {
                     context.write(e);
                 }

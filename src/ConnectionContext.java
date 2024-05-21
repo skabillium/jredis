@@ -18,6 +18,10 @@ public class ConnectionContext {
         out.write(RespSerializer.serializeSimple("OK").getBytes());
     }
 
+    public void nil() throws IOException {
+        out.write(RespSerializer.serializeNull().getBytes());
+    }
+
     public void write(String message) throws IOException {
         out.write(RespSerializer.serialize(message).getBytes());
     }
