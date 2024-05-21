@@ -13,6 +13,15 @@ public class CommandParser {
                 return new Command.InfoCommand();
             case "ping":
                 return new Command.PingCommand();
+            case "keys":
+                if (split.length > 2) {
+                    throw new IllegalArgumentException("Invalid number of arguments for 'keys' command");
+                }
+                var keysCmd = new Command.KeysCommand("*");
+                if (split.length == 2) {
+                    keysCmd.pattern = split[1];
+                }
+                return keysCmd;
             case "get":
                 if (split.length != 2) {
                     throw new IllegalArgumentException("Invalid number of arguments for 'get' command");

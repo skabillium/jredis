@@ -7,6 +7,14 @@ public class Command {
     public static class PingCommand extends Command {
     }
 
+    public static class KeysCommand extends Command {
+        public String pattern;
+
+        KeysCommand(String pattern) {
+            this.pattern = pattern;
+        }
+    }
+
     public static class GetCommand extends Command {
         public String key;
 

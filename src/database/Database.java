@@ -1,12 +1,27 @@
 package database;
 
+import java.nio.file.FileSystems;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import errors.NotFoundException;
 import errors.WrongTypeException;
 
 public class Database {
     HashMap<String, Obj> keys = new HashMap<String, Obj>();
+
+    public ArrayList<String> listKeys(String pattern) {
+
+        var p = Pattern.compile(createRegexFromGlob(pattern));
+        var keys = new ArrayList<String>();
+        for (var entry : this.keys.entrySet()) {
+            if (p.matcher(entry.getKey()).find()) {
+                keys.add(entry.getKey());
+            }
+        }
+        return keys;
+    }
 
     public void set(String key, String value) {
         keys.put(key, new KVObj(value, 0));
@@ -110,4 +125,30 @@ public class Database {
         };
         return list.popTail();
     }
+
+    private String createRegexFromGlob(String glob) {
+        String out = "^";
+        for (int i = 0; i < glob.length(); ++i) {
+            final char c = glob.charAt(i);
+            switch (c) {
+                case '*':
+                    out += ".*";
+                    break;
+                case '?':
+                    out += '.';
+                    break;
+                case '.':
+                    out += "\\.";
+                    break;
+                case '\\':
+                    out += "\\\\";
+                    break;
+                default:
+                    out += c;
+            }
+        }
+        out += '$';
+        return out;
+    }
+
 }

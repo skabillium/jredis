@@ -1,5 +1,7 @@
 package resp;
 
+import java.util.Collection;
+
 public class RespSerializer {
     public static String serialize(String str) {
         return String.format("$%d\r\n%s\r\n", str.length(), str);
@@ -11,6 +13,14 @@ public class RespSerializer {
 
     public static String serialize(int i) {
         return String.format(":%d\r\n", i);
+    }
+
+    public static String serialize(Collection<String> strs) {
+        var res = String.format("*%d\r\n", strs.size());
+        for (var str : strs) {
+            res = res.concat(serialize(str));
+        }
+        return res;
     }
 
     public static String serializeNull() {

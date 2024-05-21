@@ -2,6 +2,7 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 
 import resp.RespSerializer;
 
@@ -22,6 +23,10 @@ public class ConnectionContext {
         out.write(RespSerializer.serializeNull().getBytes());
     }
 
+    public void simple(String message) throws IOException {
+        out.write(RespSerializer.serializeSimple(message).getBytes());
+    }
+
     public void write(String message) throws IOException {
         out.write(RespSerializer.serialize(message).getBytes());
     }
@@ -32,6 +37,10 @@ public class ConnectionContext {
 
     public void write(Exception e) throws IOException {
         out.write(RespSerializer.serialize(e).getBytes());
+    }
+
+    public void write(Collection<String> col) throws IOException {
+        out.write(RespSerializer.serialize(col).getBytes());
     }
 
     public void writeln(String message) throws IOException {

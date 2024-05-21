@@ -41,21 +41,19 @@ public class JRedisServer {
                     switch (command) {
                         case Command.InfoCommand info ->
                             context.write("JRedis server version 0.0.0");
-                        case Command.PingCommand ping -> context.writeln("PONG");
+                        case Command.PingCommand ping -> context.simple("PONG");
+                        case Command.KeysCommand keys -> context.write(db.listKeys(keys.pattern));
                         case Command.SetCommand set -> {
                             db.set(set.key, set.value);
                             context.ok();
                         }
-                        case Command.GetCommand get -> {
-                            var value = db.get(get.key);
-                            context.write(value);
-                        }
+                        case Command.GetCommand get -> context.write(db.get(get.key));
                         case Command.DeleteCommand del -> context.write(db.delete(del.keys));
                         case Command.LLenCommand llen -> context.write(db.listLength(llen.key));
                         case Command.LPushCommand lpush -> context.write(db.listLPush(lpush.key, lpush.values));
                         case Command.RPopCommand rpop -> context.write(db.listRPop(rpop.key));
                         case Command.LPopCommand lpop -> context.write(db.listLPop(lpop.key));
-                        default -> context.writeln("IDK what to do with that");
+                        default -> throw new Exception("Unreachable");
                     }
                 } catch (NotFoundException e) {
                     context.nil();
