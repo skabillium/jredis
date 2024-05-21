@@ -7,6 +7,7 @@ public class CommandParser {
             throw new IllegalArgumentException("Empty string");
         }
 
+        var argc = split.length;
         var cmd = split[0].toLowerCase();
         switch (cmd) {
             case "info":
@@ -28,10 +29,18 @@ public class CommandParser {
                 }
                 return new Command.GetCommand(split[1]);
             case "set":
-                if (split.length != 3) {
+                if (split.length < 3) {
                     throw new IllegalArgumentException("Invalid number of arguments for 'set' command");
                 }
-                return new Command.SetCommand(split[1], split[2]);
+                var set = new Command.SetCommand(split[1], split[2]);
+                if (argc > 3 && split[3].toLowerCase().equals("ex")) {
+                    // Parse expiration option
+                    if (argc != 5) {
+                        throw new IllegalArgumentException("Invalid number of arguments for 'set' command");
+                    }
+                    set.expires = Integer.parseInt(split[4]);
+                }
+                return set;
             case "del":
                 if (split.length < 2) {
                     throw new IllegalArgumentException("Invalid number of arguments for 'del' command");

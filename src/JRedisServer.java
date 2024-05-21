@@ -44,7 +44,7 @@ public class JRedisServer {
                         case Command.PingCommand ping -> context.simple("PONG");
                         case Command.KeysCommand keys -> context.write(db.listKeys(keys.pattern));
                         case Command.SetCommand set -> {
-                            db.set(set.key, set.value);
+                            db.set(set.key, set.value, set.expires);
                             context.ok();
                         }
                         case Command.GetCommand get -> context.write(db.get(get.key));

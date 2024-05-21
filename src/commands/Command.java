@@ -27,6 +27,7 @@ public class Command {
     public static class SetCommand extends Command {
         public String key;
         public String value;
+        public int expires = 0;
 
         SetCommand(String key, String value) {
             this.key = key;

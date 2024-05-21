@@ -12,7 +12,6 @@ public class Database {
     HashMap<String, Obj> keys = new HashMap<String, Obj>();
 
     public ArrayList<String> listKeys(String pattern) {
-
         var p = Pattern.compile(createRegexFromGlob(pattern));
         var keys = new ArrayList<String>();
         for (var entry : this.keys.entrySet()) {
@@ -23,12 +22,17 @@ public class Database {
         return keys;
     }
 
-    public void set(String key, String value) {
-        keys.put(key, new KVObj(value, 0));
+    public void set(String key, String value, int expires) {
+        var obj = new KVObj(value, 0);
+        if (expires != 0) {
+            System.out.printf("SETTING EXPIRE IN %d SECONDS \n", expires);
+            obj.expireIn(expires);
+        }
+        keys.put(key, obj);
     }
 
     public String get(String key) throws WrongTypeException, NotFoundException {
-        var obj = this.keys.get(key);
+        var obj = getObj(key);
         if (obj == null) {
             throw new NotFoundException();
         }
@@ -124,6 +128,18 @@ public class Database {
             default -> throw new WrongTypeException();
         };
         return list.popTail();
+    }
+
+    private Obj getObj(String key) {
+        var obj = keys.get(key);
+        if (obj == null) {
+            return null;
+        }
+        if (obj.isExpired()) {
+            keys.remove(key);
+            return null;
+        }
+        return obj;
     }
 
     private String createRegexFromGlob(String glob) {
