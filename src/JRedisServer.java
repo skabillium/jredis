@@ -1,6 +1,4 @@
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -53,6 +51,10 @@ public class JRedisServer {
                             context.write(value);
                         }
                         case Command.DeleteCommand del -> context.write(db.delete(del.keys));
+                        case Command.LLenCommand llen -> context.write(db.listLength(llen.key));
+                        case Command.LPushCommand lpush -> context.write(db.listLPush(lpush.key, lpush.values));
+                        case Command.RPopCommand rpop -> context.write(db.listRPop(rpop.key));
+                        case Command.LPopCommand lpop -> context.write(db.listLPop(lpop.key));
                         default -> context.writeln("IDK what to do with that");
                     }
                 } catch (NotFoundException e) {

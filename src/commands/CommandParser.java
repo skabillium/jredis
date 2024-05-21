@@ -32,6 +32,41 @@ public class CommandParser {
                     keys[i - 1] = split[i];
                 }
                 return new Command.DeleteCommand(keys);
+            case "llen":
+                if (split.length != 2) {
+                    throw new IllegalArgumentException("Invalid number of arguments for 'llen' command");
+                }
+                return new Command.LLenCommand(split[1]);
+            case "lpush": {
+                if (split.length < 3) {
+                    throw new IllegalArgumentException("Invalid number of arguments for 'llen' command");
+                }
+                var values = new String[split.length - 2];
+                for (int i = 2; i < split.length; i++) {
+                    values[i - 2] = split[i];
+                }
+                return new Command.LPushCommand(split[1], values);
+            }
+            case "rpush": {
+                if (split.length < 3) {
+                    throw new IllegalArgumentException("Invalid number of arguments for 'llen' command");
+                }
+                var values = new String[split.length - 2];
+                for (int i = 2; i < split.length; i++) {
+                    values[i - 2] = split[i];
+                }
+                return new Command.RPushCommand(split[1], values);
+            }
+            case "lpop":
+                if (split.length != 2) {
+                    throw new IllegalArgumentException("Invalid number of arguments for 'lpop' command");
+                }
+                return new Command.LPopCommand(split[1]);
+            case "rpop":
+                if (split.length != 2) {
+                    throw new IllegalArgumentException("Invalid number of arguments for 'rpop' command");
+                }
+                return new Command.RPopCommand(split[1]);
             default:
                 throw new IllegalArgumentException(String.format("Unknown command: '%s'", cmd));
         }

@@ -33,4 +33,48 @@ public class Command {
             this.keys = keys;
         }
     }
+
+    public static class LLenCommand extends Command {
+        public String key;
+
+        LLenCommand(String key) {
+            this.key = key;
+        }
+    }
+
+    public static class LPushCommand extends Command {
+        public String key;
+        public String[] values;
+
+        LPushCommand(String key, String[] values) {
+            this.key = key;
+            this.values = values;
+        }
+    }
+
+    public static class RPushCommand extends Command {
+        public String key;
+        public String[] values;
+
+        RPushCommand(String key, String[] values) {
+            this.key = key;
+            this.values = values;
+        }
+    }
+
+    public static class LPopCommand extends Command {
+        public String key;
+
+        LPopCommand(String key) {
+            this.key = key;
+        }
+    }
+
+    public static class RPopCommand extends Command {
+        public String key;
+
+        RPopCommand(String key) {
+            this.key = key;
+        }
+    }
 }
