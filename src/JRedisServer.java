@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import commands.*;
 import database.Database;
+import errors.*;
 
 public class JRedisServer {
     private CliOptions config;
@@ -22,11 +23,9 @@ public class JRedisServer {
 
             // Accept client connections
             Socket clientSocket = serverSocket.accept();
-            System.out.println("Client connected: " + clientSocket);
 
             var inputStream = clientSocket.getInputStream();
             var context = new ConnectionContext(inputStream, clientSocket.getOutputStream());
-
             var db = new Database();
 
             // Read data from the client
@@ -44,7 +43,7 @@ public class JRedisServer {
                     var command = CommandParser.parseCommand(payload);
                     switch (command) {
                         case Command.InfoCommand info ->
-                            context.writeln("JRedis server version 0.0.0");
+                            context.write("JRedis server version 0.0.0");
                         case Command.PingCommand ping -> context.writeln("PONG");
                         case Command.SetCommand set -> {
                             db.set(set.key, set.value);
@@ -52,12 +51,12 @@ public class JRedisServer {
                         }
                         case Command.GetCommand get -> {
                             var value = db.get(get.key);
-                            context.writeln(value);
+                            context.write(value);
                         }
                         default -> context.writeln("IDK what to do with that");
                     }
                 } catch (Exception e) {
-                    context.writeln(String.format("[ERROR]: %s", e.getMessage()));
+                    context.write(e);
                 }
             }
 

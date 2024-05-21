@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import resp.RespSerializer;
+
 public class ConnectionContext {
     private InputStream in;
     private OutputStream out;
@@ -13,11 +15,15 @@ public class ConnectionContext {
     }
 
     public void ok() throws IOException {
-        writeln("OK");
+        out.write(RespSerializer.serializeSimple("OK").getBytes());
     }
 
     public void write(String message) throws IOException {
-        out.write(message.getBytes());
+        out.write(RespSerializer.serialize(message).getBytes());
+    }
+
+    public void write(Exception e) throws IOException {
+        out.write(RespSerializer.serialize(e).getBytes());
     }
 
     public void writeln(String message) throws IOException {
