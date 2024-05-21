@@ -12,6 +12,10 @@ public class ConnectionContext {
         this.out = out;
     }
 
+    public void ok() throws IOException {
+        writeln("OK");
+    }
+
     public void write(String message) throws IOException {
         out.write(message.getBytes());
     }

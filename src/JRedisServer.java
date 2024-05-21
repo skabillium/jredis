@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import commands.*;
+import database.Database;
 
 public class JRedisServer {
     private CliOptions config;
@@ -26,6 +27,8 @@ public class JRedisServer {
             var inputStream = clientSocket.getInputStream();
             var context = new ConnectionContext(inputStream, clientSocket.getOutputStream());
 
+            var db = new Database();
+
             // Read data from the client
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -43,6 +46,14 @@ public class JRedisServer {
                         case Command.InfoCommand info ->
                             context.writeln("JRedis server version 0.0.0");
                         case Command.PingCommand ping -> context.writeln("PONG");
+                        case Command.SetCommand set -> {
+                            db.set(set.key, set.value);
+                            context.ok();
+                        }
+                        case Command.GetCommand get -> {
+                            var value = db.get(get.key);
+                            context.writeln(value);
+                        }
                         default -> context.writeln("IDK what to do with that");
                     }
                 } catch (Exception e) {
