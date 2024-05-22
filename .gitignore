@@ -1,2 +1,5 @@
 # Binary
 out/
+
+# Write ahead log
+wal.log

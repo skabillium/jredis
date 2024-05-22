@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,15 +11,32 @@ import commands.*;
 import database.Database;
 import errors.*;
 import resp.RespDeserializer;
+import resp.RespSerializer;
+import resp.RespSimpleString;
 
 public class JRedisServer {
     private CliOptions config;
+    private FileOutputStream walStream;
 
     public JRedisServer(CliOptions config) {
         this.config = config;
     }
 
-    public void start() {
+    public void start() throws FileNotFoundException {
+        if (config.walEnabled) {
+            var wal = new File(config.wal);
+            var parentPath = wal.getParent();
+            if (parentPath != null) {
+                var dir = new File(wal.getParent());
+                var created = dir.mkdirs();
+                if (!created) {
+                    System.out.println("Could not create parent dir");
+                    return;
+                }
+            }
+            walStream = new FileOutputStream(config.wal);
+        }
+
         try {
             // Create a server socket that listens on port 12345
             ServerSocket serverSocket = new ServerSocket(config.port);
@@ -51,22 +71,18 @@ public class JRedisServer {
 
                     message = message.trim();
                     var command = CommandParser.parseCommand(message);
-                    switch (command) {
-                        case Command.InfoCommand info ->
-                            context.write("JRedis server version 0.0.0");
-                        case Command.PingCommand ping -> context.simple("PONG");
-                        case Command.KeysCommand keys -> context.write(db.listKeys(keys.pattern));
-                        case Command.SetCommand set -> {
-                            db.set(set.key, set.value, set.expires);
-                            context.ok();
-                        }
-                        case Command.GetCommand get -> context.write(db.get(get.key));
-                        case Command.DeleteCommand del -> context.write(db.delete(del.keys));
-                        case Command.LLenCommand llen -> context.write(db.listLength(llen.key));
-                        case Command.LPushCommand lpush -> context.write(db.listLPush(lpush.key, lpush.values));
-                        case Command.RPopCommand rpop -> context.write(db.listRPop(rpop.key));
-                        case Command.LPopCommand lpop -> context.write(db.listLPop(lpop.key));
-                        default -> throw new Exception("Unreachable");
+
+                    if (config.walEnabled && command.isUpdate) {
+                        walAppend(message);
+                    }
+
+                    var result = executeCommand(db, command);
+                    switch (result) {
+                        case RespSimpleString simple -> context.simple(simple.toString());
+                        case String str -> context.write(str);
+                        case ArrayList<?> col -> context.write((ArrayList<String>) col);
+                        case Integer i -> context.write(i);
+                        default -> context.nil();
                     }
                 } catch (NotFoundException e) {
                     context.nil();
@@ -82,8 +98,36 @@ public class JRedisServer {
             clientSocket.close();
             // Close the server socket
             serverSocket.close();
+
+            if (config.walEnabled) {
+                walStream.close();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private Object executeCommand(Database db, Command command) throws WrongTypeException, NotFoundException {
+        return switch (command) {
+            case Command.InfoCommand info -> new RespSimpleString("JRedis server version 0.0.0");
+            case Command.PingCommand ping -> new RespSimpleString("PONG");
+            case Command.KeysCommand keys -> db.listKeys(keys.pattern);
+            case Command.SetCommand set -> {
+                db.set(set.key, set.value, set.expires);
+                yield new RespSimpleString("OK");
+            }
+            case Command.GetCommand get -> db.get(get.key);
+            case Command.DeleteCommand del -> db.delete(del.keys);
+            case Command.LLenCommand llen -> db.listLength(llen.key);
+            case Command.LPushCommand lpush -> db.listLPush(lpush.key, lpush.values);
+            case Command.RPopCommand rpop -> db.listRPop(rpop.key);
+            case Command.LPopCommand lpop -> db.listLPop(lpop.key);
+            default -> null;
+        };
+    }
+
+    private void walAppend(String message) throws IOException {
+        walStream.write(RespSerializer.serialize(message).getBytes());
     }
 }

@@ -1,13 +1,14 @@
-import java.util.ArrayList;
-
-import resp.RespSerializer;
+import java.io.FileNotFoundException;
 
 public class JRedis {
     public static void main(String[] args) {
         try {
             var options = parseCliArgs(args);
+            System.out.println(options.wal);
             var server = new JRedisServer(options);
             server.start();
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not find wal file: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             System.out.println("Error while parsing arguments, " + e.getMessage());
         }
@@ -42,6 +43,16 @@ public class JRedis {
                         throw new IllegalArgumentException("Expected to specify password");
                     }
                     options.setPassword(args[i + 1]);
+                    i++;
+                    break;
+                case "--enable-wal":
+                    options.setWalEnabled(true);
+                    break;
+                case "--wal":
+                    if (i == args.length - 1) {
+                        throw new IllegalArgumentException("Expected to specify wal file path");
+                    }
+                    options.setWal(args[i + 1]);
                     i++;
                     break;
                 case "--noauth":

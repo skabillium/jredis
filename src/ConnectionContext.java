@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 
 import resp.RespSerializer;
+import resp.RespSimpleString;
 
 public class ConnectionContext {
     private InputStream in;
@@ -41,6 +42,10 @@ public class ConnectionContext {
 
     public void write(Collection<String> col) throws IOException {
         out.write(RespSerializer.serialize(col).getBytes());
+    }
+
+    public void write(RespSimpleString string) throws IOException {
+        out.write(RespSerializer.serialize(string).getBytes());
     }
 
     public void writeln(String message) throws IOException {

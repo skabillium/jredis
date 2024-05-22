@@ -23,6 +23,10 @@ public class RespSerializer {
         return res;
     }
 
+    public static String serialize(RespSimpleString string) {
+        return String.format("+%d\r\n", string.toString());
+    }
+
     public static String serializeNull() {
         return "$-1\r\n";
     }

@@ -1,6 +1,8 @@
 package commands;
 
 public class Command {
+    public boolean isUpdate = false;
+
     public static class InfoCommand extends Command {
     }
 
@@ -32,6 +34,7 @@ public class Command {
         SetCommand(String key, String value) {
             this.key = key;
             this.value = value;
+            this.isUpdate = true;
         }
     }
 
@@ -40,6 +43,7 @@ public class Command {
 
         DeleteCommand(String[] keys) {
             this.keys = keys;
+            this.isUpdate = true;
         }
     }
 
@@ -58,6 +62,7 @@ public class Command {
         LPushCommand(String key, String[] values) {
             this.key = key;
             this.values = values;
+            this.isUpdate = true;
         }
     }
 
@@ -68,6 +73,7 @@ public class Command {
         RPushCommand(String key, String[] values) {
             this.key = key;
             this.values = values;
+            this.isUpdate = true;
         }
     }
 
@@ -76,6 +82,7 @@ public class Command {
 
         LPopCommand(String key) {
             this.key = key;
+            this.isUpdate = true;
         }
     }
 
@@ -84,6 +91,7 @@ public class Command {
 
         RPopCommand(String key) {
             this.key = key;
+            this.isUpdate = true;
         }
     }
 }

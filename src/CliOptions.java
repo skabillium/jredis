@@ -3,24 +3,30 @@ public class CliOptions {
     public boolean authEnabled = true;
     public String user = "jredis";
     public String password = "password";
+    public boolean walEnabled = false;
+    public String wal = "wal.log";
 
-    public CliOptions setPort(int port) {
+    public void setPort(int port) {
         this.port = port;
-        return this;
     }
 
-    public CliOptions setAuthEnabled(boolean authEnabled) {
+    public void setAuthEnabled(boolean authEnabled) {
         this.authEnabled = authEnabled;
-        return this;
     }
 
-    public CliOptions setUser(String user) {
+    public void setUser(String user) {
         this.user = user;
-        return this;
     }
 
-    public CliOptions setPassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
-        return this;
+    }
+
+    public void setWalEnabled(boolean walEnabled) {
+        this.walEnabled = walEnabled;
+    }
+
+    public void setWal(String wal) {
+        this.wal = wal;
     }
 }
