@@ -46,4 +46,12 @@ public class ConnectionContext {
     public void writeln(String message) throws IOException {
         out.write((message + "\n").getBytes());
     }
+
+    public InputStream getInputStream() {
+        return in;
+    }
+
+    public OutputStream getOutputStream() {
+        return out;
+    }
 }

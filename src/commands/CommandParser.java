@@ -1,7 +1,9 @@
 package commands;
 
+import errors.InvalidNumArgsException;
+
 public class CommandParser {
-    public static Command parseCommand(String source) throws IllegalArgumentException {
+    public static Command parseCommand(String source) throws InvalidNumArgsException {
         var split = splitTokens(source);
         if (split.length == 0) {
             throw new IllegalArgumentException("Empty string");
@@ -16,7 +18,7 @@ public class CommandParser {
                 return new Command.PingCommand();
             case "keys":
                 if (split.length > 2) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'keys' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 var keysCmd = new Command.KeysCommand("*");
                 if (split.length == 2) {
@@ -25,25 +27,25 @@ public class CommandParser {
                 return keysCmd;
             case "get":
                 if (split.length != 2) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'get' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.GetCommand(split[1]);
             case "set":
                 if (split.length < 3) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'set' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 var set = new Command.SetCommand(split[1], split[2]);
                 if (argc > 3 && split[3].toLowerCase().equals("ex")) {
                     // Parse expiration option
                     if (argc != 5) {
-                        throw new IllegalArgumentException("Invalid number of arguments for 'set' command");
+                        throw new InvalidNumArgsException(cmd);
                     }
                     set.expires = Integer.parseInt(split[4]);
                 }
                 return set;
             case "del":
                 if (split.length < 2) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'del' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 var keys = new String[split.length - 1];
                 for (int i = 1; i < split.length; i++) {
@@ -52,12 +54,12 @@ public class CommandParser {
                 return new Command.DeleteCommand(keys);
             case "llen":
                 if (split.length != 2) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'llen' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.LLenCommand(split[1]);
             case "lpush": {
                 if (split.length < 3) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'llen' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 var values = new String[split.length - 2];
                 for (int i = 2; i < split.length; i++) {
@@ -67,7 +69,7 @@ public class CommandParser {
             }
             case "rpush": {
                 if (split.length < 3) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'llen' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 var values = new String[split.length - 2];
                 for (int i = 2; i < split.length; i++) {
@@ -77,12 +79,12 @@ public class CommandParser {
             }
             case "lpop":
                 if (split.length != 2) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'lpop' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.LPopCommand(split[1]);
             case "rpop":
                 if (split.length != 2) {
-                    throw new IllegalArgumentException("Invalid number of arguments for 'rpop' command");
+                    throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.RPopCommand(split[1]);
             default:

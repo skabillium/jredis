@@ -1,10 +1,13 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import commands.*;
 import database.Database;
 import errors.*;
+import resp.RespDeserializer;
 
 public class JRedisServer {
     private CliOptions config;
@@ -25,19 +28,29 @@ public class JRedisServer {
             var inputStream = clientSocket.getInputStream();
             var context = new ConnectionContext(inputStream, clientSocket.getOutputStream());
             var db = new Database();
-
-            // Read data from the client
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
+            var deserializer = new RespDeserializer(context.getInputStream());
+            while (true) {
                 try {
-                    var payload = new String(buffer, 0, bytesRead);
-                    payload = payload.trim();
-                    if (payload.isEmpty()) {
-                        continue;
+                    var payload = deserializer.deserialize();
+                    var message = switch (payload) {
+                        case String s -> s;
+                        case List<?> l -> {
+                            var strings = new ArrayList<String>();
+                            for (var s : l) {
+                                strings.add(s.toString());
+                            }
+                            yield String.join(" ", strings);
+                        }
+                        case null -> null;
+                        default -> throw new IOException("Type not supported");
+                    };
+
+                    if (message == null) {
+                        break;
                     }
 
-                    var command = CommandParser.parseCommand(payload);
+                    message = message.trim();
+                    var command = CommandParser.parseCommand(message);
                     switch (command) {
                         case Command.InfoCommand info ->
                             context.write("JRedis server version 0.0.0");
@@ -57,6 +70,9 @@ public class JRedisServer {
                     }
                 } catch (NotFoundException e) {
                     context.nil();
+                } catch (IOException e) {
+                    context.write(e);
+                    break;
                 } catch (Exception e) {
                     context.write(e);
                 }
