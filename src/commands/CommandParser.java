@@ -1,9 +1,10 @@
 package commands;
 
 import errors.InvalidNumArgsException;
+import errors.UnbalancedQuotesException;
 
 public class CommandParser {
-    public static Command parseCommand(String source) throws InvalidNumArgsException {
+    public static Command parseCommand(String source) throws InvalidNumArgsException, UnbalancedQuotesException {
         var split = splitTokens(source);
         if (split.length == 0) {
             throw new IllegalArgumentException("Empty string");

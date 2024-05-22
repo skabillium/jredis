@@ -4,7 +4,6 @@ public class JRedis {
     public static void main(String[] args) {
         try {
             var options = parseCliArgs(args);
-            System.out.println(options.wal);
             var server = new JRedisServer(options);
             server.start();
         } catch (FileNotFoundException e) {

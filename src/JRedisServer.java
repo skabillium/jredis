@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,14 +18,24 @@ import resp.RespSimpleString;
 public class JRedisServer {
     private CliOptions config;
     private FileOutputStream walStream;
+    private Database db;
 
     public JRedisServer(CliOptions config) {
         this.config = config;
+        this.db = new Database();
     }
 
     public void start() throws FileNotFoundException {
         if (config.walEnabled) {
             var wal = new File(config.wal);
+            if (wal.exists()) {
+                try {
+                    buildDatabaseFromWal(wal);
+                } catch (Exception e) {
+                    System.out.println("Error while rebuilding database: " + e.getMessage());
+                    return;
+                }
+            }
             var parentPath = wal.getParent();
             if (parentPath != null) {
                 var dir = new File(wal.getParent());
@@ -47,7 +58,6 @@ public class JRedisServer {
 
             var inputStream = clientSocket.getInputStream();
             var context = new ConnectionContext(inputStream, clientSocket.getOutputStream());
-            var db = new Database();
             var deserializer = new RespDeserializer(context.getInputStream());
             while (true) {
                 try {
@@ -80,7 +90,13 @@ public class JRedisServer {
                     switch (result) {
                         case RespSimpleString simple -> context.simple(simple.toString());
                         case String str -> context.write(str);
-                        case ArrayList<?> col -> context.write((ArrayList<String>) col);
+                        case ArrayList<?> col -> {
+                            var strings = new ArrayList<String>();
+                            for (Object object : col) {
+                                strings.add(object.toString());
+                            }
+                            context.write(strings);
+                        }
                         case Integer i -> context.write(i);
                         default -> context.nil();
                     }
@@ -125,6 +141,39 @@ public class JRedisServer {
             case Command.LPopCommand lpop -> db.listLPop(lpop.key);
             default -> null;
         };
+    }
+
+    private void buildDatabaseFromWal(File wal)
+            throws FileNotFoundException, IOException, InvalidNumArgsException, WrongTypeException, NotFoundException,
+            UnbalancedQuotesException {
+        var in = new FileInputStream(wal);
+        var deserializer = new RespDeserializer(in);
+        var total = 0;
+        while (true) {
+            var payload = deserializer.deserialize();
+            var message = switch (payload) {
+                case String s -> s;
+                case List<?> l -> {
+                    var strings = new ArrayList<String>();
+                    for (var s : l) {
+                        strings.add(s.toString());
+                    }
+                    yield String.join(" ", strings);
+                }
+                case null -> null;
+                default -> throw new IOException("Type not supported");
+            };
+
+            if (message == null) {
+                break;
+            }
+
+            message = message.trim();
+            var command = CommandParser.parseCommand(message);
+            executeCommand(this.db, command);
+            total++;
+        }
+        System.out.printf("Executed %d commands", total);
     }
 
     private void walAppend(String message) throws IOException {
