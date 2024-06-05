@@ -130,6 +130,25 @@ public class Database {
         return list.popTail();
     }
 
+    public int setAdd(String key, String[] values) throws WrongTypeException {
+        var obj = getObj(key);
+        var found = obj != null;
+        if (!found) {
+            obj = new SetObj();
+        }
+
+        var set = switch (obj) {
+            case SetObj s -> s.set;
+            default -> throw new WrongTypeException();
+        };
+
+        for (var i = 0; i < values.length; i++) {
+            set.add(values[i]);
+        }
+
+        return values.length;
+    }
+
     private Obj getObj(String key) {
         var obj = keys.get(key);
         if (obj == null) {

@@ -139,6 +139,7 @@ public class JRedisServer {
             case Command.LPushCommand lpush -> db.listLPush(lpush.key, lpush.values);
             case Command.RPopCommand rpop -> db.listRPop(rpop.key);
             case Command.LPopCommand lpop -> db.listLPop(lpop.key);
+            case Command.SAddCommand sadd -> db.setAdd(sadd.key, sadd.values);
             default -> null;
         };
     }

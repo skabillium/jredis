@@ -94,4 +94,15 @@ public class Command {
             this.isUpdate = true;
         }
     }
+
+    public static class SAddCommand extends Command {
+        public String key;
+        public String[] values;
+
+        SAddCommand(String key, String[] values) {
+            this.isUpdate = true;
+            this.key = key;
+            this.values = values;
+        }
+    }
 }

@@ -88,6 +88,15 @@ public class CommandParser {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.RPopCommand(split[1]);
+            case "sadd":
+                if (split.length < 3) {
+                    throw new InvalidNumArgsException(cmd);
+                }
+                var values = new String[split.length - 2];
+                for (var i = 2; i < split.length; i++) {
+                    values[i - 2] = split[i];
+                }
+                return new Command.SAddCommand(split[1], values);
             default:
                 throw new IllegalArgumentException(String.format("Unknown command: '%s'", cmd));
         }
