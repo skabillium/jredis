@@ -105,4 +105,15 @@ public class Command {
             this.values = values;
         }
     }
+
+    public static class SRemCommand extends Command {
+        public String key;
+        public String[] values;
+
+        SRemCommand(String key, String[] values) {
+            this.isUpdate = true;
+            this.key = key;
+            this.values = values;
+        }
+    }
 }

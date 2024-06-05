@@ -1,6 +1,5 @@
 package database;
 
-import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -146,7 +145,30 @@ public class Database {
             set.add(values[i]);
         }
 
+        if (!found) {
+            keys.put(key, obj);
+        }
+
         return values.length;
+    }
+
+    public int setRemove(String key, String[] values) throws WrongTypeException, NotFoundException {
+        var obj = getObj(key);
+        if (obj == null) {
+            throw new NotFoundException();
+        }
+
+        var set = switch (obj) {
+            case SetObj s -> s.set;
+            default -> throw new WrongTypeException();
+        };
+
+        var removed = 0;
+        for (var i = 0; i < values.length; i++) {
+            removed += set.remove(values[i]) ? 1 : 0;
+        }
+
+        return removed;
     }
 
     private Obj getObj(String key) {
