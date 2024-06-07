@@ -108,6 +108,11 @@ public class CommandParser {
                 }
                 return new Command.SRemCommand(split[1], values);
             }
+            case "sismember":
+                if (split.length < 3) {
+                    throw new InvalidNumArgsException(cmd);
+                }
+                return new Command.SIsMemberCommand(split[1], split[2]);
             default:
                 throw new IllegalArgumentException(String.format("Unknown command: '%s'", cmd));
         }

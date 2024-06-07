@@ -116,4 +116,14 @@ public class Command {
             this.values = values;
         }
     }
+
+    public static class SIsMemberCommand extends Command {
+        public String key;
+        public String value;
+
+        SIsMemberCommand(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
 }

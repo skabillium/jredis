@@ -98,6 +98,7 @@ public class JRedisServer {
                             context.write(strings);
                         }
                         case Integer i -> context.write(i);
+                        case Boolean b -> context.write(b ? 1 : 0);
                         default -> context.nil();
                     }
                 } catch (NotFoundException e) {
@@ -141,6 +142,7 @@ public class JRedisServer {
             case Command.LPopCommand lpop -> db.listLPop(lpop.key);
             case Command.SAddCommand sadd -> db.setAdd(sadd.key, sadd.values);
             case Command.SRemCommand srem -> db.setRemove(srem.key, srem.values);
+            case Command.SIsMemberCommand isMember -> db.setIsMember(isMember.key, isMember.value);
             default -> null;
         };
     }

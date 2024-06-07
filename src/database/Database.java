@@ -171,6 +171,20 @@ public class Database {
         return removed;
     }
 
+    public boolean setIsMember(String key, String value) throws WrongTypeException, NotFoundException {
+        var obj = getObj(key);
+        if (obj == null) {
+            throw new NotFoundException();
+        }
+
+        var set = switch (obj) {
+            case SetObj s -> s.set;
+            default -> throw new WrongTypeException();
+        };
+
+        return set.contains(value);
+    }
+
     private Obj getObj(String key) {
         var obj = keys.get(key);
         if (obj == null) {
