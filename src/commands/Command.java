@@ -126,4 +126,12 @@ public class Command {
             this.value = value;
         }
     }
+
+    public static class SCardCommand extends Command {
+        public String key;
+
+        SCardCommand(String key) {
+            this.key = key;
+        }
+    }
 }

@@ -143,6 +143,7 @@ public class JRedisServer {
             case Command.SAddCommand sadd -> db.setAdd(sadd.key, sadd.values);
             case Command.SRemCommand srem -> db.setRemove(srem.key, srem.values);
             case Command.SIsMemberCommand isMember -> db.setIsMember(isMember.key, isMember.value);
+            case Command.SCardCommand scard -> db.setCardinality(scard.key);
             default -> null;
         };
     }

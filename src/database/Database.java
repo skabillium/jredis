@@ -185,6 +185,20 @@ public class Database {
         return set.contains(value);
     }
 
+    public int setCardinality(String key) throws WrongTypeException, NotFoundException {
+        var obj = getObj(key);
+        if (obj == null) {
+            throw new NotFoundException();
+        }
+
+        var set = switch (obj) {
+            case SetObj s -> s.set;
+            default -> throw new WrongTypeException();
+        };
+
+        return set.size();
+    }
+
     private Obj getObj(String key) {
         var obj = keys.get(key);
         if (obj == null) {

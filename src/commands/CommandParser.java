@@ -113,6 +113,11 @@ public class CommandParser {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.SIsMemberCommand(split[1], split[2]);
+            case "scard":
+                if (split.length != 2) {
+                    throw new InvalidNumArgsException(cmd);
+                }
+                return new Command.SCardCommand(split[1]);
             default:
                 throw new IllegalArgumentException(String.format("Unknown command: '%s'", cmd));
         }
