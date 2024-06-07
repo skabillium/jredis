@@ -2,6 +2,7 @@ package database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 import errors.NotFoundException;
@@ -197,6 +198,28 @@ public class Database {
         };
 
         return set.size();
+    }
+
+    public ArrayList<String> setIntersection(String[] keys) throws WrongTypeException, NotFoundException {
+        var sets = new ArrayList<HashSet<String>>();
+        for (var key : keys) {
+            var obj = getObj(key);
+            if (obj == null) {
+                throw new NotFoundException();
+            }
+            var set = switch (obj) {
+                case SetObj s -> s.set;
+                default -> throw new WrongTypeException();
+            };
+            sets.add(set);
+        }
+
+        var intersection = new HashSet<String>(sets.getFirst());
+        for (var set : sets) {
+            intersection.retainAll(set);
+        }
+
+        return new ArrayList<String>(intersection);
     }
 
     private Obj getObj(String key) {

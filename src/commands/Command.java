@@ -134,4 +134,12 @@ public class Command {
             this.key = key;
         }
     }
+
+    public static class SInterCommand extends Command {
+        public String[] keys;
+
+        SInterCommand(String[] keys) {
+            this.keys = keys;
+        }
+    }
 }

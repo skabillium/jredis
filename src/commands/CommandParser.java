@@ -44,7 +44,7 @@ public class CommandParser {
                     set.expires = Integer.parseInt(split[4]);
                 }
                 return set;
-            case "del":
+            case "del": {
                 if (split.length < 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
@@ -53,6 +53,7 @@ public class CommandParser {
                     keys[i - 1] = split[i];
                 }
                 return new Command.DeleteCommand(keys);
+            }
             case "llen":
                 if (split.length != 2) {
                     throw new InvalidNumArgsException(cmd);
@@ -118,6 +119,16 @@ public class CommandParser {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.SCardCommand(split[1]);
+            case "sinter": {
+                if (split.length == 1) {
+                    throw new InvalidNumArgsException(cmd);
+                }
+                var keys = new String[split.length - 1];
+                for (var i = 0; i < keys.length; i++) {
+                    keys[i] = split[i + 1];
+                }
+                return new Command.SInterCommand(keys);
+            }
             default:
                 throw new IllegalArgumentException(String.format("Unknown command: '%s'", cmd));
         }

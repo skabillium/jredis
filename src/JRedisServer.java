@@ -144,6 +144,7 @@ public class JRedisServer {
             case Command.SRemCommand srem -> db.setRemove(srem.key, srem.values);
             case Command.SIsMemberCommand isMember -> db.setIsMember(isMember.key, isMember.value);
             case Command.SCardCommand scard -> db.setCardinality(scard.key);
+            case Command.SInterCommand sinter -> db.setIntersection(sinter.keys);
             default -> null;
         };
     }
