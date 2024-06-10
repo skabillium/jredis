@@ -54,78 +54,61 @@ public class Database {
     }
 
     public int listLength(String key) throws NotFoundException, WrongTypeException {
-        var listObj = keys.get(key);
-        if (listObj == null) {
+        var obj = keys.get(key);
+        if (obj == null) {
             throw new NotFoundException();
         }
-
-        var list = switch (listObj) {
-            case ListObj l -> l.list;
-            default -> throw new WrongTypeException();
-        };
-
+        var list = asListObj(obj).list;
         return list.length;
     }
 
     public int listLPush(String key, String[] values) throws WrongTypeException {
-        var listObj = keys.get(key);
-        var found = listObj != null;
+        var obj = keys.get(key);
+        var found = obj != null;
         if (!found) {
-            listObj = new ListObj(0);
+            obj = new ListObj(0);
         }
-        var list = switch (listObj) {
-            case ListObj l -> l.list;
-            default -> throw new WrongTypeException();
-        };
+        var list = asListObj(obj).list;
         for (var value : values) {
             list.prepend(value);
         }
         if (!found) {
-            keys.put(key, listObj);
+            keys.put(key, obj);
         }
         return values.length;
     }
 
     public int listRPush(String key, String[] values) throws WrongTypeException {
-        var listObj = keys.get(key);
-        var found = listObj != null;
+        var obj = keys.get(key);
+        var found = obj != null;
         if (!found) {
-            listObj = new ListObj(0);
+            obj = new ListObj(0);
         }
-        var list = switch (listObj) {
-            case ListObj l -> l.list;
-            default -> throw new WrongTypeException();
-        };
+        var list = asListObj(obj).list;
         for (var value : values) {
             list.append(value);
         }
         if (!found) {
-            keys.put(key, listObj);
+            keys.put(key, obj);
         }
         return values.length;
     }
 
     public String listLPop(String key) throws NotFoundException, WrongTypeException {
-        var listObj = keys.get(key);
-        if (listObj == null) {
+        var obj = keys.get(key);
+        if (obj == null) {
             throw new NotFoundException();
         }
-        var list = switch (listObj) {
-            case ListObj l -> l.list;
-            default -> throw new WrongTypeException();
-        };
+        var list = asListObj(obj).list;
         return list.popHead();
     }
 
     public String listRPop(String key) throws NotFoundException, WrongTypeException {
-        var listObj = keys.get(key);
-        if (listObj == null) {
+        var obj = keys.get(key);
+        if (obj == null) {
             throw new NotFoundException();
         }
-        var list = switch (listObj) {
-            case ListObj l -> l.list;
-            default -> throw new WrongTypeException();
-        };
+        var list = asListObj(obj).list;
         return list.popTail();
     }
 
@@ -208,6 +191,13 @@ public class Database {
             return null;
         }
         return obj;
+    }
+
+    private ListObj asListObj(Obj obj) throws WrongTypeException {
+        return switch (obj) {
+            case ListObj list -> list;
+            default -> throw new WrongTypeException();
+        };
     }
 
     private SetObj asSetObj(Obj obj) throws WrongTypeException {
