@@ -25,7 +25,6 @@ public class Database {
     public void set(String key, String value, int expires) {
         var obj = new KVObj(value, 0);
         if (expires != 0) {
-            System.out.printf("SETTING EXPIRE IN %d SECONDS \n", expires);
             obj.expireIn(expires);
         }
         keys.put(key, obj);
@@ -137,20 +136,17 @@ public class Database {
             obj = new SetObj();
         }
 
-        var set = switch (obj) {
-            case SetObj s -> s.set;
-            default -> throw new WrongTypeException();
-        };
-
+        var setobj = asSetObj(obj);
+        var added = 0;
         for (var i = 0; i < values.length; i++) {
-            set.add(values[i]);
+            added += setobj.add(values[i]) ? 1 : 0;
         }
 
         if (!found) {
             keys.put(key, obj);
         }
 
-        return values.length;
+        return added;
     }
 
     public int setRemove(String key, String[] values) throws WrongTypeException, NotFoundException {
@@ -158,18 +154,8 @@ public class Database {
         if (obj == null) {
             throw new NotFoundException();
         }
-
-        var set = switch (obj) {
-            case SetObj s -> s.set;
-            default -> throw new WrongTypeException();
-        };
-
-        var removed = 0;
-        for (var i = 0; i < values.length; i++) {
-            removed += set.remove(values[i]) ? 1 : 0;
-        }
-
-        return removed;
+        var setobj = asSetObj(obj);
+        return setobj.remove(values);
     }
 
     public boolean setIsMember(String key, String value) throws WrongTypeException, NotFoundException {
@@ -177,13 +163,8 @@ public class Database {
         if (obj == null) {
             throw new NotFoundException();
         }
-
-        var set = switch (obj) {
-            case SetObj s -> s.set;
-            default -> throw new WrongTypeException();
-        };
-
-        return set.contains(value);
+        var setobj = asSetObj(obj);
+        return setobj.isMember(value);
     }
 
     public int setCardinality(String key) throws WrongTypeException, NotFoundException {
@@ -191,13 +172,8 @@ public class Database {
         if (obj == null) {
             throw new NotFoundException();
         }
-
-        var set = switch (obj) {
-            case SetObj s -> s.set;
-            default -> throw new WrongTypeException();
-        };
-
-        return set.size();
+        var setobj = asSetObj(obj);
+        return setobj.getCardinality();
     }
 
     public ArrayList<String> setIntersection(String[] keys) throws WrongTypeException, NotFoundException {
@@ -232,6 +208,13 @@ public class Database {
             return null;
         }
         return obj;
+    }
+
+    private SetObj asSetObj(Obj obj) throws WrongTypeException {
+        return switch (obj) {
+            case SetObj set -> set;
+            default -> throw new WrongTypeException();
+        };
     }
 
     private String createRegexFromGlob(String glob) {

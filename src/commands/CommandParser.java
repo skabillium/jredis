@@ -18,7 +18,7 @@ public class CommandParser {
             case "ping":
                 return new Command.PingCommand();
             case "keys":
-                if (split.length > 2) {
+                if (argc > 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var keysCmd = new Command.KeysCommand("*");
@@ -27,12 +27,12 @@ public class CommandParser {
                 }
                 return keysCmd;
             case "get":
-                if (split.length != 2) {
+                if (argc != 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.GetCommand(split[1]);
             case "set":
-                if (split.length < 3) {
+                if (argc < 3) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var set = new Command.SetCommand(split[1], split[2]);
@@ -45,7 +45,7 @@ public class CommandParser {
                 }
                 return set;
             case "del": {
-                if (split.length < 2) {
+                if (argc < 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var keys = new String[split.length - 1];
@@ -55,12 +55,12 @@ public class CommandParser {
                 return new Command.DeleteCommand(keys);
             }
             case "llen":
-                if (split.length != 2) {
+                if (argc != 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.LLenCommand(split[1]);
             case "lpush": {
-                if (split.length < 3) {
+                if (argc < 3) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var values = new String[split.length - 2];
@@ -70,7 +70,7 @@ public class CommandParser {
                 return new Command.LPushCommand(split[1], values);
             }
             case "rpush": {
-                if (split.length < 3) {
+                if (argc < 3) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var values = new String[split.length - 2];
@@ -80,17 +80,17 @@ public class CommandParser {
                 return new Command.RPushCommand(split[1], values);
             }
             case "lpop":
-                if (split.length != 2) {
+                if (argc != 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.LPopCommand(split[1]);
             case "rpop":
-                if (split.length != 2) {
+                if (argc != 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.RPopCommand(split[1]);
             case "sadd": {
-                if (split.length < 3) {
+                if (argc < 3) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var values = new String[split.length - 2];
@@ -100,7 +100,7 @@ public class CommandParser {
                 return new Command.SAddCommand(split[1], values);
             }
             case "srem": {
-                if (split.length < 3) {
+                if (argc < 3) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var values = new String[split.length - 2];
@@ -110,17 +110,17 @@ public class CommandParser {
                 return new Command.SRemCommand(split[1], values);
             }
             case "sismember":
-                if (split.length < 3) {
+                if (argc < 3) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.SIsMemberCommand(split[1], split[2]);
             case "scard":
-                if (split.length != 2) {
+                if (argc != 2) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 return new Command.SCardCommand(split[1]);
             case "sinter": {
-                if (split.length == 1) {
+                if (argc == 1) {
                     throw new InvalidNumArgsException(cmd);
                 }
                 var keys = new String[split.length - 1];
